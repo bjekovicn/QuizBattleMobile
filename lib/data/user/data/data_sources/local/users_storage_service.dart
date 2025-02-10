@@ -1,9 +1,7 @@
-import '/data/shared/data/models/user_model.dart';
+abstract class UsersStorageService<T> {
+  Future<T?> getCachedCurrentUser();
+  Future<void> cacheCurrentUser(T value);
 
-abstract class UsersStorageService {
-  Future<UserModel?> getCachedCurrentUser();
-  Future<void> cacheCurrentUser(UserModel value);
-
-  Future<List<UserModel>?> getCachedFriends();
-  Future<void> cacheFriends(List<UserModel> friends);
+  Future<List<T>?> getCachedFriends();
+  Future<void> cacheFriends(List<T> friends);
 }

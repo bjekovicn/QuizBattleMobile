@@ -2,10 +2,10 @@ import 'package:fpdart/fpdart.dart';
 import 'package:injectable/injectable.dart';
 
 import '/core/error_handling/failure.dart';
-import '/data/shared/data/mappers/user_mappers.dart';
 import '/data/shared/domain/entities/user_entity.dart';
 import '/data/user/domain/repositories/users_repository.dart';
 import '/data/user/data/data_sources/remote/user_api_service.dart';
+import '/data/shared/data/mappers/remote/user_model_json_mapper.dart';
 
 @Named("UsersRepository")
 @LazySingleton(as: UsersRepository)

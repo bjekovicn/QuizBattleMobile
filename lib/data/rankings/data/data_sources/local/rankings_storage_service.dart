@@ -1,6 +1,4 @@
-import '/data/shared/data/models/user_model.dart';
-
-abstract class RankingsStorageService {
-  Future<List<UserModel>?> getCachedRankings();
-  Future<void> cacheRankings(List<UserModel> rankings);
+abstract class RankingsStorageService<T> {
+  Future<List<T>?> getCachedRankings();
+  Future<void> cacheRankings(List<T> rankings);
 }

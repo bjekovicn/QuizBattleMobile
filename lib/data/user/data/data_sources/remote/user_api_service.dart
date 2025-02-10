@@ -2,7 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
 import 'package:retrofit/retrofit.dart';
 
-import '/data/shared/data/models/user_model.dart';
+import '/data/shared/data/models/remote/user_model_json.dart';
 
 part 'user_api_service.g.dart';
 
@@ -13,7 +13,7 @@ abstract class UserApiService {
   factory UserApiService(Dio dio) = _UserApiService;
 
   @GET('/user/me')
-  Future<HttpResponse<UserModel>> getCurrentUser();
+  Future<HttpResponse<UserModelJson>> getCurrentUser();
 
   @POST('/user/{userId}/challenge')
   Future<HttpResponse<String>> challengeFriend(
@@ -24,7 +24,7 @@ abstract class UserApiService {
   //
 
   @GET('/friendships/accepted')
-  Future<HttpResponse<List<UserModel>>> getFriends();
+  Future<HttpResponse<List<UserModelJson>>> getFriends();
 
   @POST('/friendships/{id}/add')
   Future<HttpResponse<void>> addFriend(@Path("id") int receiverId);

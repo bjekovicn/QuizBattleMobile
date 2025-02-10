@@ -1,7 +1,7 @@
-import '/data/shared/data/models/user_model.dart';
 import '/data/shared/domain/entities/user_entity.dart';
+import '/data/shared/data/models/local/user_model_object_box.dart';
 
-extension UserModelMapper on UserModel {
+extension ToEntityMapper on UserModelObjectBox {
   UserEntity mapToEntity() {
     return UserEntity(
       userId: userId,
@@ -16,9 +16,9 @@ extension UserModelMapper on UserModel {
   }
 }
 
-extension UserEntityMapper on UserEntity {
-  UserModel mapToModel() {
-    return UserModel(
+extension ToModelMapper on UserEntity {
+  UserModelObjectBox mapToModel() {
+    return UserModelObjectBox(
       userId: userId,
       firstName: firstName,
       lastName: lastName,

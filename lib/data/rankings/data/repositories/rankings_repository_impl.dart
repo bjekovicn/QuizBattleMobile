@@ -2,9 +2,9 @@ import 'package:fpdart/fpdart.dart';
 import 'package:injectable/injectable.dart';
 
 import '/core/error_handling/failure.dart';
-import '/data/shared/data/mappers/user_mappers.dart';
 import '/data/shared/domain/entities/user_entity.dart';
 import '/data/rankings/domain/repositories/rankings_repository.dart';
+import '/data/shared/data/mappers/remote/user_model_json_mapper.dart';
 import '/data/rankings/data/data_sources/remote/rankings_api_service.dart';
 
 @Named("RankingsRepository")

@@ -2,16 +2,17 @@ import 'package:fpdart/fpdart.dart';
 import 'package:injectable/injectable.dart';
 
 import '/core/error_handling/failure.dart';
-import '/data/shared/data/mappers/user_mappers.dart';
 import '/data/shared/domain/entities/user_entity.dart';
+import '/data/shared/data/models/local/user_model_hive.dart';
 import '/data/rankings/domain/repositories/rankings_repository.dart';
+import '/data/shared/data/mappers/local/user_model_hive_mapper.dart';
 import '/data/rankings/data/data_sources/local/rankings_storage_service.dart';
 
 @Named("CachedRankingsRepository")
 @LazySingleton(as: RankingsRepository)
 class CachedRankingsRepositoryImpl implements RankingsRepository {
-  final RankingsStorageService _storageService;
   final RankingsRepository _rankingsRepository;
+  final RankingsStorageService<UserModelHive> _storageService;
 
   CachedRankingsRepositoryImpl(
     this._storageService,

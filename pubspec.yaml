@@ -61,6 +61,7 @@ dependencies:
   firebase_messaging: ^15.2.1
   redis: ^4.0.0
   linear_timer: ^2.0.0
+  objectbox: ^4.1.0
 
 dev_dependencies:
   flutter_test:
