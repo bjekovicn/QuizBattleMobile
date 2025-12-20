@@ -9,4 +9,6 @@ abstract class AuthRepository {
   Future<Either<Failure, AuthEntity?>> getStoredAuthData();
   Future<Either<Failure, void>> storeAuthData(AuthEntity value);
   Future<Either<Failure, void>> clearStoredAuthData();
+
+  Future<int?> getUserIdFromToken();
 }

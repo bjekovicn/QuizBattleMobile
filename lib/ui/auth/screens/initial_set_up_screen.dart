@@ -10,31 +10,33 @@ class InitialSetUpScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              const SizedBox(height: 80),
-              Text(
-                context.l.intro_title,
-                style: context.textTheme.titleLarge,
-              ),
-              const SizedBox(height: 40),
-              Image.asset(
-                Assets.images.introLogo.path,
-                width: 180,
-                height: 180,
-              ),
-              const SizedBox(height: 40),
-              const IntroContent(),
-            ],
+    return SafeArea(
+      child: Scaffold(
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                const SizedBox(height: 80),
+                Text(
+                  context.l.intro_title,
+                  style: context.textTheme.titleLarge,
+                ),
+                const SizedBox(height: 40),
+                Image.asset(
+                  Assets.images.introLogo.path,
+                  width: 180,
+                  height: 180,
+                ),
+                const SizedBox(height: 40),
+                const IntroContent(),
+              ],
+            ),
           ),
         ),
+        bottomNavigationBar: const IntroNavigationButton(),
       ),
-      bottomNavigationBar: const IntroNavigationButton(),
     );
   }
 }

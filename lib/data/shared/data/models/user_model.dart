@@ -7,6 +7,7 @@ part 'user_model.g.dart';
 @JsonSerializable()
 class UserModel extends HiveObject {
   @HiveField(0)
+  @JsonKey(name: 'id')
   final int userId;
 
   @HiveField(1)
@@ -16,25 +17,30 @@ class UserModel extends HiveObject {
   final String? lastName;
 
   @HiveField(3)
+  @JsonKey(name: 'photo')
   final String? googlePhoto;
 
   @HiveField(4)
+  @JsonKey(defaultValue: 0)
   final int coins;
 
   @HiveField(5)
+  @JsonKey(defaultValue: 0)
   final int tokens;
 
   @HiveField(6)
+  @JsonKey(defaultValue: 0)
   final int gamesWon;
 
   @HiveField(7)
+  @JsonKey(defaultValue: 0)
   final int gamesLost;
 
   UserModel({
     required this.userId,
-    required this.firstName,
-    required this.lastName,
-    required this.googlePhoto,
+    this.firstName,
+    this.lastName,
+    this.googlePhoto,
     required this.coins,
     required this.tokens,
     required this.gamesWon,

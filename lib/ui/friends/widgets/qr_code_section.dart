@@ -103,7 +103,7 @@ class _QRActionContainer extends StatelessWidget {
           child: InkWell(
             onTap: onTap,
             borderRadius: BorderRadius.circular(14),
-            splashColor: Colors.purple.withOpacity(0.5),
+            splashColor: Colors.purple..withValues(alpha: 0.5),
             child: Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(

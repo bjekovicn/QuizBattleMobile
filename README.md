@@ -1,2 +1,1 @@
-# quiz_clean_demo
-![RB Diagram drawio](https://github.com/user-attachments/assets/31646be7-1e3b-464c-a8a7-9f90b9ca0a5a)
+flutter pub run build_runner build --delete-conflicting-outputs

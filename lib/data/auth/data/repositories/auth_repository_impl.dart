@@ -1,5 +1,9 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:fpdart/fpdart.dart';
 import 'package:injectable/injectable.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 import '/core/error_handling/failure.dart';
 import '/data/auth/data/mappers/auth_mappers.dart';
@@ -21,7 +25,26 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<Either<Failure, AuthEntity>> authGoogle(String googleToken) async {
     try {
-      final res = await _authApiService.authGoogle('Bearer $googleToken');
+      final token = await FirebaseMessaging.instance.getToken();
+
+      int? devicePlatform;
+      if (Platform.isAndroid) {
+        devicePlatform = 1;
+      } else if (Platform.isIOS) {
+        devicePlatform = 2;
+      }
+
+      final platform = Platform.operatingSystem;
+      final version = Platform.operatingSystemVersion;
+
+      final requestBody = {
+        'idToken': googleToken,
+        'deviceToken': token,
+        'devicePlatform': devicePlatform,
+        'deviceInfo': '$platform $version',
+      };
+
+      final res = await _authApiService.authGoogle(requestBody);
 
       await _authStorageService.saveAuthData(res.data);
 
@@ -60,6 +83,30 @@ class AuthRepositoryImpl implements AuthRepository {
       return Right(null);
     } catch (exception) {
       return Left(Failure.handle(exception));
+    }
+  }
+
+  @override
+  Future<int?> getUserIdFromToken() async {
+    try {
+      final storedData = await _authStorageService.getAuthData();
+      if (storedData == null) return null;
+
+      final parts = storedData.accessToken.split('.');
+      if (parts.length != 3) return null;
+
+      final payload = parts[1];
+      final normalizedPayload = base64Url.normalize(payload);
+      final payloadMap = json.decode(
+        utf8.decode(base64Url.decode(normalizedPayload)),
+      ) as Map<String, dynamic>;
+
+      final userIdString = payloadMap['sub'] as String?;
+      if (userIdString == null) return null;
+
+      return int.tryParse(userIdString);
+    } catch (e) {
+      return null;
     }
   }
 }

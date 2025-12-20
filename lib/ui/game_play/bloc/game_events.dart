@@ -1,39 +1,54 @@
-import '/data/game/domain/entities/game/game_end_entity.dart';
-import '/data/game/domain/entities/game/game_start_entity.dart';
-import '/data/game/domain/entities/game/round_end_entity.dart';
-import '/data/game/domain/entities/game/round_start_entity.dart';
+import '/data/game/domain/updates/game_update.dart';
 
-abstract class GameEvent {}
-
-class ListenChannelEvent extends GameEvent {}
-
-class SubscribeToUserChannelEvent extends GameEvent {}
-
-class UnsubscribeFromUserChannelEvent extends GameEvent {}
-
-class JoinToMatchMakingQueueEvent extends GameEvent {}
-
-class GameStartEvent extends GameEvent {
-  final GameStartEntity gameStartEntity;
-  GameStartEvent(this.gameStartEntity);
+sealed class GameEvent {
+  const GameEvent();
 }
 
-class RoundStartEvent extends GameEvent {
-  final RoundStartEntity roundStartEntity;
-  RoundStartEvent(this.roundStartEntity);
+// Connection Events
+class ConnectEvent extends GameEvent {
+  final JoinMatchmakingEvent? pendingMatchmaking;
+
+  const ConnectEvent({this.pendingMatchmaking});
 }
 
-class RoundEndEvent extends GameEvent {
-  final RoundEndEntity roundEndEntity;
-  RoundEndEvent(this.roundEndEntity);
+class DisconnectEvent extends GameEvent {
+  const DisconnectEvent();
 }
 
-class GameEndEvent extends GameEvent {
-  final GameEndEntity gameEndEntity;
-  GameEndEvent(this.gameEndEntity);
+// Matchmaking Events
+class JoinMatchmakingEvent extends GameEvent {
+  final int gameType;
+  final String languageCode;
+
+  const JoinMatchmakingEvent({
+    required this.gameType,
+    required this.languageCode,
+  });
 }
 
-class RoundAnswerEvent extends GameEvent {
+class LeaveMatchmakingEvent extends GameEvent {
+  const LeaveMatchmakingEvent();
+}
+
+// Room Events
+class JoinRoomEvent extends GameEvent {
+  final String roomId;
+  const JoinRoomEvent(this.roomId);
+}
+
+class SetReadyEvent extends GameEvent {
+  final bool isReady;
+  const SetReadyEvent(this.isReady);
+}
+
+// Gameplay Events
+class SubmitAnswerEvent extends GameEvent {
   final String answer;
-  RoundAnswerEvent(this.answer);
+  const SubmitAnswerEvent(this.answer);
+}
+
+// Internal Event (from SignalR)
+class GameUpdated extends GameEvent {
+  final GameUpdate update;
+  const GameUpdated(this.update);
 }

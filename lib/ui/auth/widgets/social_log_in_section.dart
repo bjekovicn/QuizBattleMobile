@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
@@ -10,8 +11,31 @@ import '/ui/auth/state/auth_event.dart';
 import '/core/di/app_config_module.dart';
 import '/core/extensions/extensions.dart';
 
-class SocialLogInSection extends StatelessWidget {
+class SocialLogInSection extends StatefulWidget {
   const SocialLogInSection({super.key});
+
+  @override
+  State<SocialLogInSection> createState() => _SocialLogInSectionState();
+}
+
+class _SocialLogInSectionState extends State<SocialLogInSection> {
+  @override
+  void initState() {
+    super.initState();
+
+    final signIn = GoogleSignIn.instance;
+
+    unawaited(
+      signIn
+          .initialize(
+            clientId: getIt<AppConfig>().googleClientId,
+            serverClientId: getIt<AppConfig>().googleServerClientId,
+          )
+          .then((_) => signIn.authenticationEvents
+              .listen(_onGoogleAuthEvent)
+              .onError(_onGoogleAuthError)),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +50,13 @@ class SocialLogInSection extends StatelessWidget {
           ),
           const SizedBox(height: 40),
           ElevatedButton(
-            onPressed: () => _logInWithGoogle(context),
+            onPressed: () async {
+              try {
+                await GoogleSignIn.instance.authenticate();
+              } catch (e) {
+                log('Google authenticate failed: $e');
+              }
+            },
             child: Text(context.l.google_sign_in),
           ),
         ],
@@ -34,24 +64,27 @@ class SocialLogInSection extends StatelessWidget {
     );
   }
 
-  Future<void> _logInWithGoogle(BuildContext context) async {
-    final messenger = ScaffoldMessenger.of(context);
-    final authBloc = BlocProvider.of<AuthBloc>(context);
-    final commonError = context.l.error_occurred;
-    try {
-      final user = await GoogleSignIn(
-        clientId: getIt<AppConfig>().googleClientId,
-      ).signIn();
-      var authentication = await user?.authentication;
+  Future<void> _onGoogleAuthEvent(GoogleSignInAuthenticationEvent event) async {
+    final authBloc = context.read<AuthBloc>();
 
-      if (authentication?.idToken == null) return;
+    final GoogleSignInAccount? user = switch (event) {
+      GoogleSignInAuthenticationEventSignIn(user: final u) => u,
+      GoogleSignInAuthenticationEventSignOut() => null,
+    };
 
-      authBloc.add(RegisterUserEvent(authentication!.idToken!));
-    } catch (error) {
-      log('Google Sign In Error: $error');
-      messenger.showSnackBar(
-        SnackBar(content: Text(commonError)),
-      );
+    if (user == null) return;
+
+    final auth = user.authentication;
+    final idToken = auth.idToken;
+
+    if (idToken == null) {
+      throw Exception('ID Token is null');
     }
+
+    authBloc.add(RegisterUserEvent(idToken));
+  }
+
+  void _onGoogleAuthError(Object e) {
+    log('Google Sign In error: $e');
   }
 }

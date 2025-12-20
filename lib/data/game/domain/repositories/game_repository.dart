@@ -1,30 +1,36 @@
 import 'package:fpdart/fpdart.dart';
 
 import '/core/error_handling/failure.dart';
-import '/data/game/domain/entities/game/game_end_entity.dart';
-import '/data/game/domain/entities/game/game_start_entity.dart';
-import '/data/game/domain/entities/game/round_end_entity.dart';
-import '/data/game/domain/entities/game/round_start_entity.dart';
+import '/data/game/domain/updates/game_update.dart';
+import '/data/game/domain/entities/game/game_room_entity.dart';
 
 abstract class GameRepository {
-  Future<Either<Failure, void>> subscribeToGameRoomChannel({
-    required String roomId,
-    required Function(RoundStartEntity) onRoundStart,
-    required Function(RoundEndEntity) onRoundEnd,
-    required Function(GameEndEntity) onGameEnd,
-  });
+  // Connection
+  Future<Either<Failure, void>> connect(String token);
+  Future<Either<Failure, void>> disconnect();
 
-  Future<Either<Failure, void>> subscribeToUserChannel({
-    required String userId,
-    required Function(GameStartEntity) onGameStart,
-  });
+  // Stream of all game updates
+  Stream<GameUpdate> get updates;
 
-  Future<Either<Failure, void>> unsubscribeFromChannel({
-    required String channelId,
-  });
+  // Matchmaking
+  Future<Either<Failure, void>> joinMatchmaking(
+    int gameType,
+    String languageCode,
+  );
+  Future<Either<Failure, void>> leaveMatchmaking(
+    int gameType,
+    String languageCode,
+  );
 
-  Future<Either<Failure, void>> publishToChannel({
-    required String channelId,
-    required String message,
-  });
+  // Room operations
+  Future<Either<Failure, GameRoomEntity?>> createRoom(
+    int gameType,
+    String languageCode,
+    int rounds,
+  );
+  Future<Either<Failure, void>> leaveRoom(String roomId);
+  Future<Either<Failure, void>> setReady(String roomId, bool ready);
+
+  // Game operations
+  Future<Either<Failure, void>> submitAnswer(String roomId, String answer);
 }
