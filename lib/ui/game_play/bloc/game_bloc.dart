@@ -331,6 +331,10 @@ class GameBloc extends Bloc<GameEvent, GameState> {
           emit(
             state.copyWith(error: Failure(int.tryParse(code) ?? 500, message)),
           );
+        // Invite Events
+        case InviteSent():
+        case InviteReceived():
+        case InviteResponse():
       }
     } catch (e, stackTrace) {
       log('[GameBloc] Update handling error: $e', stackTrace: stackTrace);

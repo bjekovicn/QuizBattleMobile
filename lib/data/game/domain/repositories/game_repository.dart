@@ -33,4 +33,24 @@ abstract class GameRepository {
 
   // Game operations
   Future<Either<Failure, void>> submitAnswer(String roomId, String answer);
+
+  // Friend Battle Methods
+  Future<Either<Failure, GameRoomEntity?>> createFriendRoom(
+    String languageCode,
+    int totalRounds,
+  );
+
+  Future<Either<Failure, void>> inviteFriend(
+    String roomId,
+    int friendId,
+  );
+
+  Future<Either<Failure, String?>> respondToInvite(
+    String inviteId,
+    bool accept,
+  );
+
+  Future<Either<Failure, void>> joinRoom(String roomId);
+
+  Future<Either<Failure, void>> startFriendBattle(String roomId);
 }

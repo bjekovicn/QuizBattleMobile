@@ -22,6 +22,11 @@ enum GameHubEvent {
   roundEnded('RoundEnded'),
   gameEnded('GameEnded'),
 
+  // Friend Battle Events
+  inviteSent('InviteSent'),
+  inviteReceived('InviteReceived'),
+  inviteResponse('InviteResponse'),
+
   // Error Events
   error('Error');
 

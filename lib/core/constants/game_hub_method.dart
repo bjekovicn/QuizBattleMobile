@@ -11,7 +11,13 @@ enum GameHubMethod {
   joinMatchmaking('JoinMatchmaking'),
   leaveMatchmaking('LeaveMatchmaking'),
   getCurrentRoom('GetCurrentRoom'),
-  getRoom('GetRoom');
+  getRoom('GetRoom'),
+  // Friend Battle Methods
+  createFriendRoom('CreateFriendRoom'),
+  inviteFriend('InviteFriend'),
+  respondToInvite('RespondToInvite'),
+  getRoomInviteStatuses('GetRoomInviteStatuses'),
+  startFriendBattle('StartFriendBattle');
 
   final String methodName;
   const GameHubMethod(this.methodName);

@@ -5,6 +5,8 @@ import '../entities/game/round_result_entity.dart';
 import '../entities/game/round_started_event_entity.dart';
 import '../entities/game/match_found_event_entity.dart';
 import '../entities/game/matchmaking_update_entity.dart';
+import '../entities/game/game_invite_entity.dart';
+import '../entities/game/invite_response_event_entity.dart';
 
 /// Base class for all game updates received from SignalR
 sealed class GameUpdate {
@@ -95,4 +97,22 @@ class GameErrorUpdate extends GameUpdate {
   final String code;
   final String message;
   const GameErrorUpdate(this.code, this.message);
+}
+
+/// Invite sent to friend (host receives confirmation)
+class InviteSent extends GameUpdate {
+  final GameInviteEntity invite;
+  const InviteSent(this.invite);
+}
+
+/// Invite received from host (invited user receives invite)
+class InviteReceived extends GameUpdate {
+  final GameInviteEntity invite;
+  const InviteReceived(this.invite);
+}
+
+/// Friend responded to invite (host receives response)
+class InviteResponse extends GameUpdate {
+  final InviteResponseEventEntity response;
+  const InviteResponse(this.response);
 }

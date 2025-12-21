@@ -3,6 +3,9 @@ import 'dart:developer';
 
 import 'package:fpdart/fpdart.dart';
 import 'package:injectable/injectable.dart';
+import 'package:quizcleandemo/data/game/data/data_sources/remote/rest/game_invite_api_service.dart';
+import 'package:quizcleandemo/data/game/data/models/signalr/game_invite_model.dart';
+import 'package:quizcleandemo/data/game/data/models/signalr/invite_response_event_model.dart';
 
 import '/core/error_handling/failure.dart';
 import '/core/constants/game_hub_event.dart';
@@ -11,7 +14,7 @@ import '/data/game/domain/updates/game_update.dart';
 import '/data/game/data/mappers/signalr/game_room_mapper.dart';
 import '/data/game/data/mappers/signalr/game_player_mapper.dart';
 import '/data/game/data/mappers/signalr/game_result_mapper.dart';
-import '/data/game/data/data_sources/remote/game_hub_service.dart';
+import '../data_sources/remote/signalr/game_hub_service.dart';
 import '/data/game/data/mappers/signalr/round_result_mapper.dart';
 import '/data/game/data/mappers/signalr/round_started_event_mapper.dart';
 import '/data/game/data/mappers/signalr/match_found_event_mapper.dart';
@@ -29,10 +32,11 @@ import '/data/game/domain/repositories/game_repository.dart';
 @LazySingleton(as: GameRepository)
 class GameRepositoryImpl implements GameRepository {
   final GameHubService _hub;
+  final GameInviteApiService _inviteApiService;
   final _controller = StreamController<GameUpdate>.broadcast();
   bool _handlersRegistered = false;
 
-  GameRepositoryImpl(this._hub);
+  GameRepositoryImpl(this._hub, this._inviteApiService);
 
   void _registerEventHandlers() {
     if (_handlersRegistered) {
@@ -166,6 +170,33 @@ class GameRepositoryImpl implements GameRepository {
       },
     );
 
+    _hub.on<GameInviteModel>(
+      GameHubEvent.inviteSent.eventName,
+      GameInviteModel.fromJson,
+      (model) {
+        log('[GameRepository] InviteSent event received');
+        _controller.add(InviteSent(model.toEntity()));
+      },
+    );
+
+    _hub.on<GameInviteModel>(
+      GameHubEvent.inviteReceived.eventName,
+      GameInviteModel.fromJson,
+      (model) {
+        log('[GameRepository] InviteReceived event received');
+        _controller.add(InviteReceived(model.toEntity()));
+      },
+    );
+
+    _hub.on<InviteResponseEventModel>(
+      GameHubEvent.inviteResponse.eventName,
+      InviteResponseEventModel.fromJson,
+      (model) {
+        log('[GameRepository] InviteResponse event received: ${model.friendName} ${model.accepted ? "accepted" : "rejected"}');
+        _controller.add(InviteResponse(model.toEntity()));
+      },
+    );
+
     _handlersRegistered = true;
     log('[GameRepository] All event handlers registered');
   }
@@ -258,6 +289,68 @@ class GameRepositoryImpl implements GameRepository {
     return _hub.invoke<void>(
       GameHubMethod.submitAnswer.methodName,
       args: [roomId, answer],
+    );
+  }
+
+  @override
+  Future<Either<Failure, GameRoomEntity?>> createFriendRoom(
+    String languageCode,
+    int totalRounds,
+  ) {
+    log('[GameRepository] Calling createFriendRoom: lang=$languageCode, rounds=$totalRounds');
+    return _hub.invoke<GameRoomEntity>(
+      GameHubMethod.createFriendRoom.methodName,
+      args: [languageCode, totalRounds],
+      fromJson: (json) => GameRoomModel.fromJson(json).toEntity(),
+    );
+  }
+
+  @override
+  Future<Either<Failure, void>> inviteFriend(
+    String roomId,
+    int friendId,
+  ) {
+    log('[GameRepository] Calling inviteFriend: roomId=$roomId, friendId=$friendId');
+    return _hub.invoke<void>(
+      GameHubMethod.inviteFriend.methodName,
+      args: [roomId, friendId],
+    );
+  }
+
+  @override
+  Future<Either<Failure, String?>> respondToInvite(
+    String inviteId,
+    bool accept,
+  ) async {
+    try {
+      final res = await _inviteApiService.respondToInvite(
+        inviteId,
+        {'accept': accept},
+      );
+
+      final data = res.data;
+
+      return Right(data.accepted ? data.roomId : null);
+    } catch (exception) {
+      return Left(Failure.handle(exception));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> startFriendBattle(String roomId) {
+    log('[GameRepository] Calling startFriendBattle: roomId=$roomId');
+    return _hub.invoke<void>(
+      GameHubMethod.startFriendBattle.methodName,
+      args: [roomId],
+    );
+  }
+
+  @override
+  Future<Either<Failure, void>> joinRoom(String roomId) {
+    log('[GameRepository] Calling joinRoom: roomId=$roomId');
+    return _hub.invoke<void>(
+      GameHubMethod.joinRoom.methodName,
+      args: [roomId],
     );
   }
 
